@@ -1,0 +1,403 @@
+{% extends 'productos/base.html' %}
+{% load static %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<!-- Sección de bienvenida -->
+<div class="welcome-section">
+    <div class="welcome-content">
+        <img src="{% static 'productos/logo/modobestia.jpeg' %}" alt="Modo Bestia Logo" class="welcome-logo">
+        <h1 class="welcome-title">Bienvenido a Modo Bestia</h1>
+        <p class="welcome-description">Encuentra los mejores suplementos deportivos para mejorar tu rendimiento al mejor precio y con calidad garantizada.</p>
+    </div>
+</div>
+
+<!-- Slider de Ofertas -->
+<div class="slider-container">
+    <div class="slider">
+        <div class="slides">
+            <!-- Ofertas -->
+            {% for oferta in ofertas %}
+            <div class="slide{% if forloop.first %} active{% endif %}">
+                <a href="{% url 'ver_productos_categoria' oferta.categoria.id %}">
+                    <img src="{{ oferta.imagen_promocional.url }}" alt="{{ oferta.nombre_oferta }}" class="slider-image">
+                </a>
+                <div class="caption">
+                    <h5>{{ oferta.nombre_oferta }}</h5>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="slider-controls">
+            <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+            <a class="next" onclick="plusSlides(1)">&#10095;</a>
+        </div>
+    </div>
+</div>
+
+<!-- Sección de Categorías -->
+<div class="categories-section">
+    <h2 class="categories-title">Explora Nuestras Categorías</h2>
+    <div class="categories-grid">
+        {% for categoria in categorias %}
+        <div class="category-card">
+            <div class="category-image-container">
+                <img src="{{ categoria.imagen.url }}" alt="{{ categoria.nombre }}" class="category-image">
+            </div>
+            <div class="category-info">
+                <h5 class="category-title">{{ categoria.nombre }}</h5>
+                <a href="{% url 'ver_productos_categoria' categoria.id %}" class="btn btn-category">Ver Productos</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Sección de Ubicación -->
+<section class="location-section">
+    <div class="location-map">
+        <!-- Google Maps Embed -->
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3166.6721975277774!2d-72.35351418869833!3d-37.468460914265606!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x966bdd47d664f2c3%3A0x68b1d87853e51e9c!2zR2FsZXLDrWEgQ29sw7Nu!5e0!3m2!1ses-419!2scl!4v1721944533714!5m2!1ses-419!2scl" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+    <div class="location-details">
+        <h2 class="location-title">Encuéntranos</h2>
+        <p class="location-description">Visítanos en nuestra tienda física para descubrir más productos y ofertas especiales. Nos encontramos en una ubicación de fácil acceso con estacionamiento disponible.</p>
+        <div class="contact-info">
+            <p><strong>Dirección:</strong> Los Ángeles, Valdivia 485, Local 21, Galería Colón.</p>
+            <p><strong>Teléfono:</strong> (+569) 4530 5793</p>
+            <p><strong>Email:</strong> contacto@modobestia.cl</p>
+        </div>
+        <div class="opening-hours">
+            <h3>Horarios de Atención:</h3>
+            <ul>
+                <li>Lunes a Viernes: 9:00 AM - 7:00 PM</li>
+                <li>Sábado: 10:00 AM - 5:00 PM</li>
+                <li>Domingo: Cerrado</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Sección de Contacto -->
+<section class="contact-section">
+    <h2 class="contact-title">Contáctanos</h2>
+    <p class="contact-description">Si tienes alguna pregunta o necesitas más información, no dudes en ponerte en contacto con nosotros.</p>
+    <div class="contact-details">
+        <p><strong>Email:</strong> <a href="mailto:contacto@modobestia.cl">contacto@modobestia.cl</a></p>
+        <p><strong>Teléfono:</strong> (+569) 4530 5793</p>
+        <p><strong>WhatsApp:</strong> <a href="https://wa.me/+56945305793" target="_blank" rel="noopener noreferrer">(+569) 4530 5793</a></p>
+    </div>
+</section>
+
+<style>
+    /* General */
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Poppins', sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        line-height: 1.6;
+    }
+
+    /* Sección de bienvenida */
+    .welcome-section {
+        background: linear-gradient(135deg, #1a1a1a, #444444);
+        color: #ffffff;
+        text-align: center;
+        padding: 80px 20px;
+        margin-top: 80px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        position: relative;
+    }
+
+    .welcome-content {
+        max-width: 800px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .welcome-logo {
+        width: 180px;
+        margin-bottom: 20px;
+        transition: transform 0.3s ease-in-out;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        border-radius: 50%;
+    }
+
+    .welcome-logo:hover {
+        transform: scale(1.1);
+    }
+
+    .welcome-title {
+        font-size: 3rem;
+        margin: 10px 0;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .welcome-description {
+        font-size: 1.2rem;
+        margin-top: 10px;
+        line-height: 1.5;
+        max-width: 600px;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Slider */
+    .slider-container {
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        margin-top: 40px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .slider {
+        position: relative;
+        max-width: 100%;
+        margin: auto;
+        overflow: hidden;
+        height: 500px; /* Ajusta la altura del slider */
+    }
+
+    .slides {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+    }
+
+    .slide {
+        min-width: 100%;
+        box-sizing: border-box;
+        position: relative;
+        display: none; /* Oculta todas las diapositivas por defecto */
+    }
+
+    .slide.active {
+        display: block; /* Solo muestra la diapositiva activa */
+    }
+
+    .slider-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .caption {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #ffffff;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .slider-controls {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        transform: translateY(-50%);
+    }
+
+    .slider-controls a {
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #ffffff;
+        padding: 10px;
+        border-radius: 50%;
+        text-decoration: none;
+        font-size: 24px;
+        transition: background-color 0.3s ease-in-out;
+    }
+
+    .slider-controls a:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    /* Sección de categorías */
+    .categories-section {
+        padding: 40px 20px;
+        background-color: #eeeeee;
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .categories-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .category-card {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        text-align: center;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .category-image-container {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .category-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .category-info {
+        padding: 15px;
+    }
+
+    .category-title {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .btn-category {
+        background-color: #4a4a4a;
+        color: #ffffff;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: background-color 0.3s ease-in-out;
+    }
+
+    .btn-category:hover {
+        background-color: #333;
+    }
+
+    /* Sección de ubicación */
+    .location-section {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 40px 20px;
+        background-color: #ffffff;
+    }
+
+    .location-map {
+        flex: 1;
+        min-width: 300px;
+        margin-right: 20px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .location-details {
+        flex: 2;
+        min-width: 300px;
+    }
+
+    .location-title {
+        font-size: 2rem;
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    .location-description {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+
+    .contact-info {
+        margin-bottom: 20px;
+    }
+
+    .contact-info p {
+        margin: 5px 0;
+    }
+
+    .opening-hours {
+        font-size: 1rem;
+    }
+
+    .opening-hours ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .opening-hours li {
+        margin-bottom: 5px;
+    }
+
+    /* Sección de contacto */
+    .contact-section {
+        padding: 40px 20px;
+        background-color: #f4f4f4;
+    }
+
+    .contact-title {
+        font-size: 2rem;
+        margin-bottom: 15px;
+        color: #333;
+        text-align: center;
+    }
+
+    .contact-description {
+        font-size: 1.2rem;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .contact-details {
+        text-align: center;
+    }
+
+    .contact-details p {
+        margin: 10px 0;
+        font-size: 1.1rem;
+    }
+
+    .contact-details a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .contact-details a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<script>
+    let slideIndex = 1;
+    showSlides(slideIndex);
+
+    function plusSlides(n) {
+        showSlides(slideIndex += n);
+    }
+
+    function showSlides(n) {
+        let slides = document.querySelectorAll(".slide");
+        if (n > slides.length) {slideIndex = 1}
+        if (n < 1) {slideIndex = slides.length}
+        slides.forEach((slide) => slide.style.display = "none");
+        slides[slideIndex-1].style.display = "block";
+    }
+</script>
+{% endblock %}

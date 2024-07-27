@@ -1,0 +1,330 @@
+{% extends 'productos/base.html' %}
+{% load static %}
+{% block title %}Carrito de Compras{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="bg-light p-4 rounded shadow-sm">
+        <h2 class="mb-4 text-center">Carrito de Compras</h2>
+
+        {% if carrito_items %}
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Tipo de Envío</h3>
+                    <form method="post" action="{% url 'ver_carrito' %}" id="tipo-envio-form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="tipo_envio">Selecciona el tipo de envío:</label>
+                            <select name="tipo_envio" id="tipo_envio" class="form-control">
+                                {% for key, value in tipo_envio_choices %}
+                                    <option value="{{ key }}" {% if pedido.tipo_envio == key %} selected {% endif %}>{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Actualizar Tipo de Envío</button>
+                    </form>
+
+                    <div class="mt-4">
+                        {% if pedido.tipo_envio == 'domicilio_registro' %}
+                            <p><strong>Dirección de Envío:</strong> {{ pedido.direccion_envio }}</p>
+                        {% elif pedido.tipo_envio == 'domicilio_manual' %}
+                            <form method="POST" action="{% url 'ver_carrito' %}">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="nueva_direccion" placeholder="Ingrese nueva dirección">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Guardar Dirección</button>
+                            </form>
+                        {% elif pedido.tipo_envio == 'retiro_sucursal' %}
+                            <p><strong>Dirección de Retiro:</strong> Modo Bestia, Los Ángeles, CHILE, Galería Colón, Calle Valdivia, Frente al Mall</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h3>Productos en el Carrito</h3>
+                    <div class="list-group">
+                        {% for item in carrito_items %}
+                            <div class="list-group-item d-flex justify-content-between align-items-start border rounded mb-3 p-3">
+                                <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" class="img-fluid rounded mr-3" style="max-width: 120px;">
+                                <div class="w-100">
+                                    <h5 class="mb-1">{{ item.producto.nombre }}</h5>
+                                    <p class="mb-1">
+                                        {% if item.producto.descuento > 0 %}
+                                        <span class="text-danger text-decoration-line-through">Precio Normal: ${{ item.producto.precio }}</span><br>
+                                        <span class="text-success font-weight-bold">Precio Oferta: ${{ item.producto.precio_con_descuento }}</span>
+                                        {% else %}
+                                        Precio: ${{ item.producto.precio }}
+                                        {% endif %}
+                                    </p>
+                                    <form class="modificar-cantidad-form d-inline-block" data-url="{% url 'modificar_cantidad' item.id %}">
+                                        {% csrf_token %}
+                                        <div class="input-group">
+                                            <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1" max="{{ item.producto.stock }}" class="form-control">
+                                            <div class="input-group-append">
+                                                <button type="submit" class="btn btn-warning">
+                                                    <i class="fas fa-edit"></i> Modificar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <button class="btn btn-danger eliminar-item-btn ml-2" data-url="{% url 'eliminar_del_carrito' item.id %}">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                    </button>
+                                    {% if item.cantidad >= 3 %}
+                                        <p class="mt-2 mb-0"><strong>Subtotal: ${{ item.total_producto }}</strong></p>
+                                    {% endif %}
+                                </div>
+                                <span class="badge bg-primary text-white rounded-pill">$ {{ item.total_producto }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <hr>
+                    <h4 class="text-center mb-4">Total del Carrito: $ <span id="carrito-total-valor">{{ total_carrito}}</span></h4>
+                   
+
+                        <form method="POST" action="{% url 'aplicar_cupon' %}" class="text-center" id="cupon-form">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="codigo_cupon">Código del Cupón:</label>
+                                <input type="text" name="codigo_cupon" id="codigo_cupon" class="form-control" placeholder="Ingresa el código del cupón">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Aplicar Cupón</button>
+                        </form>
+
+                    <form method="POST" action="{% url 'realizar_pedido' %}" class="text-center mt-4" id="realizar-pedido-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="tipo_envio" value="{{ pedido.tipo_envio }}">
+                        <button type="submit" class="btn btn-success">Realizar Pedido</button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-center">Tu carrito está vacío.</p>
+        {% endif %}
+        <div id="messages" data-messages="[]"></div>
+    </div>
+</div>
+
+<style>
+    .precio-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .precio-normal {
+        text-decoration: line-through;
+        color: red;
+        font-size: 1.1em;
+    }
+    .precio-oferta {
+        color: #28a745; /* Verde para destacar la oferta */
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+    .list-group-item {
+        background-color: #ffffff;
+        border: 1px solid #dee2e6;
+    }
+    .badge {
+        font-size: 1.1em;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Confirmación para eliminar producto del carrito
+        document.querySelectorAll('.eliminar-item-btn').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const url = this.getAttribute('data-url');
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: 'Tus productos se eliminarán. ¿Estás seguro de realizar esta acción?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                this.closest('.list-group-item').remove();
+                                document.getElementById('carrito-total-valor').innerText = data.carrito_total;
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Eliminado',
+                                    text: data.message
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: data.message
+                                });
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }
+                });
+            });
+        });
+
+        // Confirmación para modificar cantidad en el carrito
+        document.querySelectorAll('.modificar-cantidad-form').forEach(form => {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                const url = this.getAttribute('data-url');
+                const formData = new FormData(this);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Actualizado',
+                            text: data.message
+                        }).then(() => {
+                            location.reload(); // Recargar la página para actualizar el carrito
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message
+                        });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+
+        // Confirmación para actualizar tipo de envío
+        const tipoEnvioForm = document.getElementById('tipo-envio-form');
+        if (tipoEnvioForm) {
+            tipoEnvioForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: '¿Deseas actualizar el tipo de envío?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, actualizar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        tipoEnvioForm.submit(); // Enviar el formulario si el usuario confirma
+                    }
+                });
+            });
+        }
+
+        // Confirmación para aplicar cupón
+        const cuponForm = document.getElementById('cupon-form');
+        if (cuponForm) {
+            cuponForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                const url = cuponForm.action;
+                const formData = new FormData(cuponForm);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cupón Aplicado',
+                            text: `Cupón aplicado: ${data.message}\nDescuento: ${data.descuento}\nTotal: ${data.total}`,
+                            confirmButtonText: 'Aceptar'
+                        }).then(() => {
+                            // Actualizar el total del carrito con el nuevo total con descuento
+                            document.getElementById('carrito-total-valor').innerText = data.total;
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message,
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ocurrió un problema al aplicar el cupón.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                });
+            });
+        }
+
+        // Confirmación para realizar el pedido
+        const realizarPedidoForm = document.getElementById('realizar-pedido-form');
+        if (realizarPedidoForm) {
+            realizarPedidoForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: '¿Deseas finalizar tu pedido?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, realizar pedido',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(realizarPedidoForm.action, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: new URLSearchParams(new FormData(realizarPedidoForm)).toString()
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: data.messages[0].title,
+                                    text: data.messages[0].text
+                                }).then(() => {
+                                    window.location.href = data.redirect; // Redirigir al usuario a la página de estado del pedido
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: data.messages[0].text
+                                });
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,153 @@
+/* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #0d0d0d;
+    color: #ffffff;
+    background-image: url('https://wallpapers.com/images/hd/minimalist-dbz-logo-xntvtl7vhhef9y2g.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+/* Contenedor */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Barra de navegación */
+.navbar {
+    background-color: #1c1c1c;
+    padding: 15px 0;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease-in-out;
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar .logo {
+    display: flex;
+    align-items: center;
+}
+
+.navbar .logo img {
+    width: 60px;
+    margin-right: 10px;
+    border-radius: 50%;
+}
+
+.navbar .logo h1 {
+    margin: 0;
+    font-size: 28px;
+    color: #f5ed19;
+}
+
+.nav-links {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.nav-links li {
+    margin-left: 25px;
+    position: relative;
+}
+
+.nav-links a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 20px;
+    transition: color 0.3s ease-in-out;
+}
+
+.nav-links a:hover {
+    color: #f5ed19;
+}
+
+/* Submenús */
+.sub-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #1c1c1c;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+.nav-links li:hover .sub-menu {
+    display: block;
+}
+
+.sub-menu li {
+    width: 200px;
+    padding: 10px;
+    text-align: left;
+}
+
+.sub-menu li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 18px;
+    transition: color 0.3s ease-in-out;
+}
+
+.sub-menu li a:hover {
+    color: #f5ed19;
+}
+
+/* Sección de descripción */
+.descripcion {
+    background-color: #1c1c1c;
+    padding: 60px 0;
+    text-align: center;
+    color: #cccccc;
+}
+
+.descripcion h2 {
+    font-size: 40px;
+    margin-bottom: 20px;
+    color: #f5ed19;
+}
+
+.descripcion p {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.descripcion img {
+    max-width: 90%;
+    border-radius: 10px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease-in-out;
+}
+
+.descripcion img:hover {
+    transform: scale(1.1);
+}
+
+/* Pie de página */
+footer {
+    background-color: #ffffff;
+    padding: 15px 0;
+    text-align: center;
+    color: #cccccc;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+footer p {
+    margin: 0;
+}

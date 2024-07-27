@@ -1,0 +1,247 @@
+{% extends 'productos/base.html' %}
+{% load static %}
+{% block title %}{{ categoria.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="jumbotron jumbotron-fluid text-center mb-4">
+        <h1 class="display-4 flaming-text">{{ categoria.nombre }}</h1>
+        <p class="lead">{{ categoria.descripcion }}</p>
+        <hr class="my-4">
+    </div>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5f5; /* Fondo gris claro */
+            color: #333; /* Texto oscuro */
+            margin: 0;
+            padding: 0;
+        }
+
+        .jumbotron {
+            background-color: #fff; /* Fondo blanco */
+            color: #333; /* Texto oscuro */
+            border-radius: 0.5rem;
+            padding: 2rem 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .flaming-text {
+            color: #333;
+            font-size: 3rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .card {
+            background-color: #fff; /* Fondo blanco */
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-img-container {
+            position: relative;
+        }
+
+        .card-img-top {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-img-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+
+        .card:hover .card-img-overlay {
+            opacity: 1;
+        }
+
+        .card-img-overlay .btn {
+            color: #fff;
+            font-size: 1.5rem;
+            margin: 0 10px;
+            text-decoration: none;
+            background: none;
+            border: none;
+        }
+
+        .card-img-overlay .btn:hover {
+            color: #ff6600;
+        }
+
+        .card-body {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-text {
+            color: #ff6600; /* Destacar el precio en naranja */
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary {
+            background-color: #ff6600;
+            border: none;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #e55b00;
+        }
+
+        .btn-secondary {
+            background-color: #333;
+            border: none;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: #222;
+        }
+
+        .footer {
+            background-color: #333;
+            padding: 20px;
+            text-align: center;
+            color: #fff;
+            border-top: 1px solid #444;
+        }
+
+        .footer p {
+            margin: 0;
+        }
+    </style>
+
+    <div class="grid-container">
+        {% for producto in productos %}
+        <div class="card mb-4">
+            <div class="card-img-container">
+                <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}">
+                <div class="card-img-overlay">
+                    <form action="{% url 'agregar_al_carrito' producto.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                    <a href="{% url 'product_detail' producto.id %}" class="btn btn-secondary">
+                        Ver Detalles
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ producto.nombre }}</h5>
+                <p class="card-text">Precio: ${{ producto.precio }}</p>
+                {% if request.user.is_staff %}
+                <div class="btn-group" role="group" aria-label="Acciones del Producto">
+                    <a href="{% url 'edit_product' producto.id %}" class="btn btn-primary">Modificar Stock</a>
+                    <a href="{% url 'delete_product' producto.id %}" class="btn btn-danger">Eliminar Producto</a>
+                </div>
+                {% endif %}
+                {% if producto.stock > 0 %}
+                <form action="{% url 'agregar_al_carrito' producto.id %}" method="post" class="mt-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-shopping-cart" aria-hidden="true"></i> Agregar al Carrito
+                    </button>
+                </form>
+                {% else %}
+                <button type="button" class="btn btn-secondary" disabled>
+                    <i class="fa fa-ban" aria-hidden="true"></i> Agotado
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const forms = document.querySelectorAll('form');
+    
+            forms.forEach(form => {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    const url = form.getAttribute('action');
+                    const formData = new FormData(form);
+    
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const message = data.messages.length > 0 ? data.messages[0] : {};
+                        Swal.fire({
+                            icon: message.icon || 'error',
+                            title: message.title || 'Error',
+                            text: message.text || 'Por favor, inténtelo de nuevo.',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed && data.success) {
+                                window.location.reload(); // Recargar la página después de aceptar la alerta
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Ha ocurrido un error. Inténtelo de nuevo.',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+</div>
+{% endblock %}
